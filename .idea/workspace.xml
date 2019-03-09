@@ -449,7 +449,7 @@
       <workItem from="1551432694804" duration="13848000" />
       <workItem from="1551570422761" duration="5879000" />
       <workItem from="1551596820852" duration="18348000" />
-      <workItem from="1551760005139" duration="38576000" />
+      <workItem from="1551760005139" duration="39191000" />
     </task>
     <servers />
   </component>
@@ -486,7 +486,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="95259000" />
+    <option name="totallyTimeSpent" value="95874000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -510,10 +510,10 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8718975" weight="0.41231343" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="7" sideWeight="0.62930346" visible="true" weight="0.44402984" />
+      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.62930346" visible="true" weight="0.44402984" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.73489934" visible="true" weight="0.2810248" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.73489934" visible="true" weight="0.2810248" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info anchor="right" id="SciView" order="7" />
       <window_info id="Structure" order="1" sideWeight="0.26510066" side_tool="true" visible="true" weight="0.2810248" />
