@@ -12,3 +12,6 @@
 *.o
 *.a
 mkmf.log
+fluent-plugin-remote_tls_syslog-1.0.0.iml
+fluent-plugin-remote_tls_syslog-1.0.0.gem
+.travis.yml
