@@ -1,27 +1,26 @@
-# fluent-plugin-remote_syslog
+# fluent-plugin-remote_tls_syslog
 
-[Fluentd](http://fluentd.org) plugin for output to remote syslog serivce 
+[Fluentd](http://fluentd.org) plugin for output to remote syslog serivce over ssl
 
 ## Requirements
 
-| fluent-plugin-remote_syslog | fluentd                 | ruby   |
+| fluent-plugin-remote_tls_syslog | fluentd                 | ruby   |
 | -------------------         | ---------               | ------ |
 | >= 1.0.0                    | >= v0.14.0 or >= v1.0.0 | >= 2.1 |
-| < 1.0.0                     | >= v0.12.0              | >= 1.9 |
 
 ## Installation
 
 ```bash
- fluent-gem install fluent-plugin-remote_syslog
+ fluent-gem install fluent-plugin-remote_tls_syslog
 ```
 
 ## Usage
 
 ```
 <match foo.bar>
-  @type remote_syslog
-  host example.com
-  port 514
+  @type remote_tls_syslog
+  host secure.com
+  port 7514
   severity debug
   program fluentd
   hostname ${tag[1]}
@@ -50,6 +49,8 @@
 | protocol          | enum (udp, tcp) (default: `udp`) |                     | transfer protocol                                     |
 | tls               | bool (default: false)            |                     | use TLS (tcp only)                                    |
 | ca_file           | string                           |                     | ca_file path (tls mode only)                          |
+| client_cert       | string                           |                     | ca_file path (tls mode only)                          |
+| client_key        | string                           |                     | ca_file path (tls mode only)                          |
 | verify_mode       | integer                          |                     | SSL verification mode (tls mode only)                 |
 | packet_size       | integer (default: `1024`)        |                     | size limitation for syslog packet                     |
 | timeout           | integer                          |                     | TCP transfer timeout. if value is 0, wait forever     |
@@ -78,7 +79,6 @@
 
 ## License
 
-Copyright (c) 2014-2017 Richard Lee. See LICENSE for details.
 =======
 # fluentd-syslog-client
 fluentd plugin for sending logs to remote syslog server over ssl
