@@ -7,7 +7,7 @@ module RemoteSyslogSender
     class NonBlockingTimeout < StandardError; end
 
     def initialize(remote_hostname, remote_port, options = {})
-      super(remote_hostname,remote_port)
+      super(remote_hostname,remote_port,options)
       print "TcpSender ********************************"
       @tls             = options[:tls]
       @retry_limit     = options[:retry_limit] || 3
@@ -66,16 +66,21 @@ module RemoteSyslogSender
           end
           if @tls
             require 'openssl'
+            print @ssl_method
             context = OpenSSL::SSL::SSLContext.new(@ssl_method)
             context.ca_file = @ca_file if @ca_file
             context.verify_mode = @verify_mode if @verify_mode
             context.cert = OpenSSL::X509::Certificate.new(File.read(@client_cert)) if @client_cert
-            context.key = OpenSSL::PKey::RSA.new(File.read(@client_key), @client_key_pass) if @client_key
+            context.key = OpenSSL::PKey::RSA.new(File.read(@client_key)) if @client_key
 
+            if @tcp_socket == nil
+              print "TCP socket screwed"
+            end
             @socket = OpenSSL::SSL::SSLSocket.new(@tcp_socket, context)
             @socket.connect
-            @socket.post_connection_check(@remote_hostname)
-            raise "verification error" if @socket.verify_result != OpenSSL::X509::V_OK
+            print "socket connected"
+            # @socket.post_connection_check(@remote_hostname)
+            # raise "verification error" if @socket.verify_result != OpenSSL::X509::V_OK
           else
             @socket = @tcp_socket
           end
@@ -110,6 +115,7 @@ module RemoteSyslogSender
         start = get_time
         begin
           result = @mutex.synchronize { @socket.__send__(method, payload) }
+          puts "sent over wire " + payload
           payload_size -= result
           payload.slice!(0, result) if payload_size > 0
         rescue IO::WaitReadable

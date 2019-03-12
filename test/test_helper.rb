@@ -12,3 +12,10 @@ require 'fluent/test/driver/output'
 require 'test/unit/rr'
 require_relative '../lib/fluent/plugin/remote_syslog_sender'
 require_relative '../lib/fluent/plugin/out_remote_syslog'
+
+unless ENV['BUNDLE_GEMFILE']
+  require 'rubygems'
+  require 'bundler'
+  Bundler.setup
+  Bundler.require
+end
