@@ -45,9 +45,12 @@ class TestRemoteSyslogSender < Test::Unit::TestCase
   # end
 
   def test_sender_tcp_nonblock
-    @sender = RemoteSyslogSender.new('a9ea88e75449611e9baa40e0f460a80c-245806492.us-east-1.elb.amazonaws.com', 7514, protocol: :tcp, timeout: 20)
-    result = @sender.write "This is a test"
-    assert_match("This is a test", result.map { |i| "'" + i.to_s + "'" }.join(","))
+    100.times do |n|
+      n += 1
+      @sender = RemoteSyslogSender.new('a9ea88e75449611e9baa40e0f460a80c-245806492.us-east-1.elb.amazonaws.com', 7514, protocol: :tcp, timeout: 20)
+      result = @sender.write "This is a test "
+      assert_match("This is a test ", result.map { |i| "'" + i.to_s + "'" }.join(","))
+    end
   end
 
   # def test_sender_multiline
