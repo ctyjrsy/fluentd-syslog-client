@@ -43,6 +43,7 @@ ADD . $GEM_PATH/gems/fluent-plugin-remote_syslog-1.0.0
 
 # Copy plugins
 COPY plugins /fluentd/plugins/
+COPY lib/fluent/plugin /fluentd/plugins/
 COPY entrypoint.sh /fluentd/entrypoint.sh
 
 # Environment variables
