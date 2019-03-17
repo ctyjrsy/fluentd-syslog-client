@@ -59,10 +59,12 @@ module Fluent
 
         def initialize
           super
+          print "out remote syslog sender init"
         end
 
         def configure(conf)
           super
+          print "inside configure"
           if @host.nil? && @host_with_port.nil?
             raise ConfigError, "host or host_with_port is required"
           end
@@ -159,51 +161,6 @@ module Fluent
           end
         end
 
-        # def write(chunk)
-        #   return if chunk.empty?
-        #
-        #   host = extract_placeholders(@host, chunk.metadata)
-        #   port = @port
-        #
-        #   puts host
-        #   puts "port name is"+port
-        #   @host_with_port = "#{host}:#{port}"
-        #
-        #   puts @host_with_port
-        #
-        #   if @host_with_port
-        #     host, port = extract_placeholders(@host_with_port, chunk.metadata).split(":")
-        #   end
-        #
-        #
-        #   Thread.current[@host_with_port] ||= create_sender(host, port)
-        #   sender = Thread.current[@host_with_port]
-        #
-        #   facility = extract_placeholders(@facility, chunk.metadata)
-        #   severity = extract_placeholders(@severity, chunk.metadata)
-        #   program = extract_placeholders(@program, chunk.metadata)
-        #   hostname = extract_placeholders(@hostname, chunk.metadata)
-        #
-        #   packet_options = {facility: facility, severity: severity, program: program}
-        #   packet_options[:hostname] = hostname unless hostname.empty?
-        #
-        #
-        #   begin
-        #     chunk.open do |io|
-        #       io.each_line do |msg|
-        #         sender.transmit(msg.chomp!, packet_options)
-        #       end
-        #     end
-        #   rescue
-        #     if Thread.current[@host_with_port]
-        #       Thread.current[@host_with_port].close
-        #       @senders.delete(Thread.current[@host_with_port])
-        #       Thread.current[@host_with_port] = nil
-        #     end
-        #     raise
-        #   end
-        # end
-
         def start
           super
         end
@@ -211,24 +168,6 @@ module Fluent
         def shutdown
           super
         end
-
-        # def write_objects(_tag, chunk)
-        #   return if chunk.empty?
-        #
-        #   payload = ''
-        #   chunk.msgpack_each do |time, record|
-        #     event = @formatter.call(time, record)
-        #     unless event.empty?
-        #       payload << event
-        #       payload << @line_breaker
-        #     end
-        #   end
-        #
-        #   unless payload.empty?
-        #     write(payload)
-        #   end
-        # end
-
 
         def create_sender(host, port)
           options = {
@@ -249,12 +188,14 @@ module Fluent
           options[:verify_mode] = @verify_mode if @verify_mode
 
           if @protocol == :tcp
+            print "creating tcp sender"
             sender = RemoteSyslogSender::TcpSender.new(
               host,
               port,
               options
             )
           else
+            print "creating udp sender"
             sender = RemoteSyslogSender::UdpSender.new(
               host,
               port,
