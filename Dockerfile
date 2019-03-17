@@ -22,7 +22,7 @@ COPY Docker-Gemfile /fluentd/Gemfile
     && gem install bundler --version 1.16.2 \
     && bundle config silence_root_warning true \
     && bundle install --gemfile=/fluentd/Gemfile --path=/fluentd/vendor/bundle \
-    && gem install fluent-plugin-remote_syslog \
+#    && gem install fluent-plugin-remote_syslog \
     && SUDO_FORCE_REMOVE=yes \
     apt-get purge -y --auto-remove \
                   -o APT::AutoRemove::RecommendsImportant=false \
@@ -39,7 +39,7 @@ COPY ./certs/logIQ.crt /fluentd/certs/
 COPY ./certs/client-crt.pem /fluentd/certs/
 COPY ./certs/client-key.pem /fluentd/certs/
 RUN touch /fluentd/etc/disable.conf
-ADD . $GEM_PATH/gems/fluent-plugin-remote_syslog-1.0.0
+#ADD . $GEM_PATH/gems/fluent-plugin-remote_syslog-1.0.0
 
 # Copy plugins
 COPY plugins /fluentd/plugins/

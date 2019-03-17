@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentdconf
+  namespace: kube-system
+  #namespace: monitoring 
+data:
+  fluent.conf: |
+    <match fluent.**>
+      @type null
+    </match>
+    <source>
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+      tag kubernetes.*
+      format json
+      read_from_head true
+    </source>
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+    </filter>
+    <match kubernetes.var.log.containers.**fluentd**.log>
+      @type null
+    </match>
+    <match kubernetes.var.log.containers.**kube-system**.log>
+      @type null
+    </match>
+    <match kubernetes.**>
+      @type remote_syslog
+      host a186d45bc46eb11e983ae0e097e27701-166956918.us-east-1.elb.amazonaws.com 
+      port 7514
+      severity debug
+      program fluentd
+      hostname a186d45bc46eb11e983ae0e097e27701-166956918.us-east-1.elb.amazonaws.com 
+      tag flu-kube
+      hostname "#{ENV['SYSLOG_HOST']}"
+      tls true
+      tag fluentd
+      ca_file ../certs/logIQ.crt
+      client_cert ../certs/client-crt.pem
+      client_key ../certs/client-key.pem
+
+     <format>
+       @type single_value
+       message_key msg
+     </format> 
+    </match>
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+    version: v1
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-logging
+        version: v1
+        kubernetes.io/cluster-service: "true"
+    spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: fluentd
+        image: quay.io/ctyjrsy/logiq-syslog-tls 
+        #image: fluent/fluentd-kubernetes-daemonset:v0.12-alpine-elasticsearch
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        env:
+        - name: FLUENT_ELASTICSEARCH_USER
+          value: none
+        - name: FLUENT_ELASTICSEARCH_PASSWORD
+          value: none
+        - name: FLUENT_UID
+          value: "0"
+        volumeMounts:
+        - name: fluentconfig
+          mountPath: /fluentd/etc/
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: fluentconfig
+        configMap:
+          name: fluentdconf
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
