@@ -84,27 +84,6 @@ module Fluent
           @senders = []
         end
 
-        # def configure(conf)
-        #   super
-        #   if @host.nil? && @host_with_port.nil?
-        #     raise ConfigError, "host or host_with_port is required"
-        #   end
-        #
-        #   if @host.nil? && @host_with_port.nil?
-        #     raise ConfigError, "host or host_with_port is required"
-        #   end
-        #
-        #
-        #   @formatter = formatter_create
-        #   unless @formatter.formatter_type == :text_per_line
-        #     raise ConfigError, "formatter_type must be text_per_line formatter"
-        #   end
-        #
-        #   validate_target = "host=#{@host}/host_with_port=#{@host_with_port}/hostname=#{@hostname}/facility=#{@facility}/severity=#{@severity}/program=#{@program}"
-        #   placeholder_validate!(:remote_syslog, validate_target)
-        #   @senders = []
-        # end
-
         def multi_workers_ready?
           true
         end
@@ -122,12 +101,6 @@ module Fluent
           @formatter.format(tag, time, r)
         end
 
-        # def emit(tag, es, chain)
-        #   chain.next
-        #   es.each {|time,record|
-        #     write(es)
-        #   }
-        # end
 
         def write(chunk)
           print "in write \n"
@@ -156,14 +129,14 @@ module Fluent
           packet_options = {facility: facility, severity: severity, program: program}
           packet_options[:hostname] = hostname unless hostname.empty?
           packet_options[:tls] = true
-          packet_options[:ca_file]="../certs/logIQ.crt"
-          packet_options[:client_cert]="../certs/client-crt.pem"
-          packet_options[:client_key]="../certs/client-key.pem"
+          packet_options[:ca_file]="/fluentd/certs/logIQ.crt"
+          packet_options[:client_cert]="/fluentd/certs/client-crt.pem"
+          packet_options[:client_key]="/fluentd/certs/client-key.pem"
 
           begin
             chunk.open do |io|
               io.each_line do |msg|
-                print " sending something \n "
+                print " sending msg \n "
                 sender.transmit(msg.chomp!, packet_options)
               end
             end
@@ -233,4 +206,3 @@ module Fluent
       end
   end
 end
-

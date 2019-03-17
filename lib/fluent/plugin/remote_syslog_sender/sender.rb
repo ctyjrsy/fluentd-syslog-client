@@ -29,12 +29,12 @@ module RemoteSyslogSender
 
       @packet.facility = options[:facility] || 'user'
       @packet.severity = options[:severity] || 'notice'
-      print ("***************** #{File.basename($0)}[#{$$}]")
+      print ("***************** #{File.basename($0)}[#{$$}] \n")
       print (options)
       @packet.tag      = "bolaRe"#options[:tag] || options[:program]  # || "#{File.basename($0)}[#{$$}]"
 
       @socket = nil
-      print "sahi me bhaiiiiiiiiiiiiiiiiiii"
+      print "init of sender \n"
     end
 
     def transmit(message, packet_options = nil)

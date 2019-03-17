@@ -8,7 +8,7 @@ module RemoteSyslogSender
 
     def initialize(remote_hostname, remote_port, options = {})
       super(remote_hostname,remote_port,options)
-      print "TcpSender ********************************"
+      print "TcpSender ******************************** \n"
       @tls             = options[:tls]
       @retry_limit     = options[:retry_limit] || 3
       @retry_interval  = options[:retry_interval] || 0.5

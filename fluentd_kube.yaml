@@ -30,19 +30,18 @@ data:
     </match>
     <match kubernetes.**>
       @type remote_syslog
-      host a186d45bc46eb11e983ae0e097e27701-166956918.us-east-1.elb.amazonaws.com 
+      host a024d9054485d11e9a1a40e68030cf61-592805097.us-east-1.elb.amazonaws.com 
       port 7514
       severity debug
       program fluentd
-      hostname a186d45bc46eb11e983ae0e097e27701-166956918.us-east-1.elb.amazonaws.com 
+      protocol tcp
+      hostname a024d9054485d11e9a1a40e68030cf61-592805097.us-east-1.elb.amazonaws.com 
       tag flu-kube
-      hostname "#{ENV['SYSLOG_HOST']}"
       tls true
-      tag fluentd
-      ca_file ../certs/logIQ.crt
-      client_cert ../certs/client-crt.pem
-      client_key ../certs/client-key.pem
-
+      tag flu-k8s
+      ca_file /fluentd/certs/logIQ.crt
+      client_cert /fluentd/certs/client-crt.pem
+      client_key /fluentd/certs/client-key.pem
      <format>
        @type single_value
        message_key msg
