@@ -3,7 +3,6 @@
 
 FROM fluent/fluentd:v1.3.3-debian-1.0
 
-LABEL maintainer="Eduardo Silva <eduardo@treasure-data.com>"
 USER root
 WORKDIR /home/fluent
 ENV PATH /fluentd/vendor/bundle/ruby/2.3.0/bin:$PATH

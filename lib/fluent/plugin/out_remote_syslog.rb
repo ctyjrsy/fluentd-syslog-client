@@ -65,6 +65,7 @@ module Fluent
         def configure(conf)
           super
           print "inside configure"
+          print conf
           if @host.nil? && @host_with_port.nil?
             raise ConfigError, "host or host_with_port is required"
           end
@@ -78,6 +79,7 @@ module Fluent
           # placeholder_validate!(:remote_syslog, validate_target)
           validate_target = "host=#{@host}/host_with_port=#{@host_with_port}/hostname=#{@hostname}/facility=#{@facility}/severity=#{@severity}/program=#{@program}"
           placeholder_validate!(:remote_syslog, validate_target)
+          print "validated the connection"
           @senders = []
         end
 
@@ -107,20 +109,22 @@ module Fluent
         end
 
         def close
+          print " in close"
           super
           @senders.each { |s| s.close if s }
           @senders.clear
         end
 
         def format(tag, time, record)
+          print "in format \n"
           r = inject_values_to_record(tag, time, record)
           @formatter.format(tag, time, r)
         end
 
-
         def write(chunk)
+          print "in write \n"
           return if chunk.empty?
-
+          print " chunk non empty \n"
           host = extract_placeholders(@host, chunk.metadata)
           port = @port
 
@@ -148,6 +152,7 @@ module Fluent
           begin
             chunk.open do |io|
               io.each_line do |msg|
+                print " sending something \n "
                 sender.transmit(msg.chomp!, packet_options)
               end
             end
@@ -162,14 +167,17 @@ module Fluent
         end
 
         def start
+          print " in start \n"
           super
         end
 
         def shutdown
+          print " in shutdown \n"
           super
         end
 
         def create_sender(host, port)
+          print " in create sender \n"
           options = {
               tls: @tls,
               whinyerrors: true,
