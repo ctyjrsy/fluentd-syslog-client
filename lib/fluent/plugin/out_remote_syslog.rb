@@ -12,7 +12,7 @@ module Fluent
       class RemoteSyslogOutput < Output
         Fluent::Plugin.register_output("remote_syslog", self)
 
-        helpers :formatter, :inject
+        helpers :formatter, :inject, :compat_parameters
 
         config_param :hostname, :string, :default => ""
 
@@ -63,6 +63,7 @@ module Fluent
         end
 
         def configure(conf)
+          compat_parameters_convert(conf, :buffer, :inject, default_chunk_key: "time")
           super
           print "inside configure"
           print conf
@@ -121,12 +122,22 @@ module Fluent
           @formatter.format(tag, time, r)
         end
 
+        # def emit(tag, es, chain)
+        #   chain.next
+        #   es.each {|time,record|
+        #     write(es)
+        #   }
+        # end
+
         def write(chunk)
           print "in write \n"
           return if chunk.empty?
           print " chunk non empty \n"
           host = extract_placeholders(@host, chunk.metadata)
           port = @port
+
+          print host
+          print port
 
           if @host_with_port
             host, port = extract_placeholders(@host_with_port, chunk.metadata).split(":")

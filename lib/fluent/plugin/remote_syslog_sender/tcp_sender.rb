@@ -90,6 +90,7 @@ module RemoteSyslogSender
             connect_retry_count += 1
             retry
           else
+            print "exception in connecting tcp via ssl"
             raise
           end
         end
@@ -97,6 +98,7 @@ module RemoteSyslogSender
     end
 
     def send_msg(payload)
+      print " inside tcp send message"
       if @timeout && @timeout >= 0
         method = :write_nonblock
       else
