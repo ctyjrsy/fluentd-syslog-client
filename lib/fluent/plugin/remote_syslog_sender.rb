@@ -24,9 +24,9 @@ module RemoteSyslogSender
           keep_alive_intvl: nil,
           program: "flash_test",
       }
-      options[:ca_file] = options[:ca_file] || "../certs/logIQ.crt"
-      options[:client_cert] = options[:client_cert] || "../certs/client-crt.pem"
-      options[:client_key] = options[:client_key] || "../certs/client-key.pem"
+      options[:ca_file] = options[:ca_file] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/logIQ.crt"
+      options[:client_cert] = options[:client_cert] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-crt.pem"
+      options[:client_key] = options[:client_key] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-key.pem"
       TcpSender.new(remote_hostname, remote_port, options)
       # TcpSender.new(remote_hostname, remote_port)
     else
