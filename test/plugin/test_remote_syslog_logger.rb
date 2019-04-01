@@ -2,20 +2,20 @@ require_relative "../test_helper"
 
 class TestRemoteSyslogSender < Test::Unit::TestCase
   def setup
-    @server_port = rand(50000) + 1024
-    @socket = UDPSocket.new
-    @socket.bind('127.0.0.1', @server_port)
+    # @server_port = rand(50000) + 1024
+    # @socket = UDPSocket.new
+    # @socket.bind('127.0.0.1', @server_port)
 
     @tcp_server = TCPServer.open('127.0.0.1', 9980)
     @tcp_server_port = @tcp_server.addr[1]
-
+    #
     # @tcp_server_wait_thread = Thread.start do
     #   @tcp_server.accept
     # end
   end
 
   def teardown
-    @socket.close
+    # @socket.close
     @tcp_server.close
   end
 
@@ -45,9 +45,10 @@ class TestRemoteSyslogSender < Test::Unit::TestCase
   # end
 
   def test_sender_tcp_nonblock
-    100.times do |n|
+    2.times do |n|
       n += 1
-      @sender = RemoteSyslogSender.new('a024d9054485d11e9a1a40e68030cf61-592805097.us-east-1.elb.amazonaws.com', 7514, protocol: :tcp, timeout: 20)
+      print " where are the logs \n"
+      @sender = RemoteSyslogSender.new('172.18.0.1', 7514, protocol: :tcp, timeout: 20, keep_alive: true)
       result = @sender.write "This is a test "
       assert_match("This is a test ", result.map { |i| "'" + i.to_s + "'" }.join(","))
     end

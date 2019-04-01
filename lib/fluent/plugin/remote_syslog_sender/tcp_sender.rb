@@ -80,7 +80,7 @@ module RemoteSyslogSender
             @socket.connect
             print "socket connected"
             # @socket.post_connection_check(@remote_hostname)
-            # raise "verification error" if @socket.verify_result != OpenSSL::X509::V_OK
+            raise "verification error" if @socket.verify_result != OpenSSL::X509::V_OK
           else
             @socket = @tcp_socket
           end
@@ -98,7 +98,8 @@ module RemoteSyslogSender
     end
 
     def send_msg(payload)
-      print " inside tcp send message"
+      print " inside tcp send message \n"
+      print " payload is "+payload + " \n"
       if @timeout && @timeout >= 0
         method = :write_nonblock
       else
@@ -117,7 +118,7 @@ module RemoteSyslogSender
         start = get_time
         begin
           result = @mutex.synchronize { @socket.__send__(method, payload) }
-          puts "sent over wire " + payload
+          print "sent over wire " + payload
           payload_size -= result
           payload.slice!(0, result) if payload_size > 0
         rescue IO::WaitReadable
@@ -137,7 +138,7 @@ module RemoteSyslogSender
             sleep retry_interval
             retry_count += 1
             retry_interval *= 2 if @exponential_backoff
-            connect
+            # connect
             retry
           else
             raise

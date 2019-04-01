@@ -31,13 +31,14 @@ module RemoteSyslogSender
       @packet.severity = options[:severity] || 'notice'
       print ("***************** #{File.basename($0)}[#{$$}] \n")
       print (options)
-      @packet.tag      = "bolaRe"#options[:tag] || options[:program]  # || "#{File.basename($0)}[#{$$}]"
+      @packet.tag      = "flash_fluentd"#options[:tag] || options[:program]  # || "#{File.basename($0)}[#{$$}]"
 
       @socket = nil
       print "init of sender \n"
     end
 
     def transmit(message, packet_options = nil)
+      print "inside transmit of sender \n"
       message.split(/\r?\n/).each do |line|
         begin
           next if line =~ /^\s*$/

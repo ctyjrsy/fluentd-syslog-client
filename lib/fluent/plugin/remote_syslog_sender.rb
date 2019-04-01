@@ -24,14 +24,19 @@ module RemoteSyslogSender
           keep_alive_intvl: nil,
           program: "flash_test",
       }
-      options[:ca_file] = options[:ca_file] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/logIQ.crt"
-      options[:client_cert] = options[:client_cert] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-crt.pem"
-      options[:client_key] = options[:client_key] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-key.pem"
+      # options[:ca_file] = options[:ca_file] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/logIQ.crt"
+      # options[:client_cert] = options[:client_cert] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-crt.pem"
+      # options[:client_key] = options[:client_key] || "/home/ohm/.rbenv/versions/2.6.1/lib/ruby/gems/2.6.0/gems/fluent-plugin-remote_syslog-1.0.0/certs/client-key.pem"
+      options[:ca_file] = options[:ca_file] || "/flash/certs/logIQ.crt"
+      options[:client_cert] = options[:client_cert] || "/flash/certs/client-crt.pem"
+      options[:client_key] = options[:client_key] || "/flash/certs/client-key.pem"
+
+      print "creating TCP Sender ********* \n"
       TcpSender.new(remote_hostname, remote_port, options)
       # TcpSender.new(remote_hostname, remote_port)
     else
       # UdpSender.new(remote_hostname, remote_port, options)
-      UdpSender.new("100.96.1.5", 7514, whinyerrors: true, program: "minitest", tls: true, ca_file: "/home/ohm/work/repo/src/bitbucket.org/logiqcloud/flash/logIQ.crt", client_cert: "/home/ohm/work/repo/src/bitbucket.org/logiqcloud/flash/client-crt.pem", client_key: "/home/ohm/work/repo/src/bitbucket.org/logiqcloud/flash/client-crt.key")
+      UdpSender.new(remote_hostname, remote_port, options)
     end
   end
 end

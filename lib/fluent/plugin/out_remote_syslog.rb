@@ -9,7 +9,7 @@ require_relative 'remote_syslog_sender/udp_sender'
 
 module Fluent
   module Plugin
-      class RemoteSyslogOutput < Output
+      class RemoteSyslogOutput < BufferedOutput
         Fluent::Plugin.register_output("remote_syslog", self)
 
         helpers :formatter, :inject, :compat_parameters
@@ -59,13 +59,13 @@ module Fluent
 
         def initialize
           super
-          print "out remote syslog sender init"
+          print "out remote syslog sender init \n"
         end
 
         def configure(conf)
           compat_parameters_convert(conf, :buffer, :inject, default_chunk_key: "time")
           super
-          print "inside configure"
+          print "inside configure \n"
           print conf
           if @host.nil? && @host_with_port.nil?
             raise ConfigError, "host or host_with_port is required"
@@ -106,38 +106,48 @@ module Fluent
           print "in write \n"
           return if chunk.empty?
           print " chunk non empty \n"
-          host = extract_placeholders(@host, chunk.metadata)
+          host = @host # extract_placeholders(@host, chunk.metadata)
           port = @port
-
-          print host
+          data = chunk.read
+          print data
+          print host+"\n"
           print port
+          print "\n"
 
-          if @host_with_port
-            host, port = extract_placeholders(@host_with_port, chunk.metadata).split(":")
-          end
+          # if @host_with_port
+          #   host, port = extract_placeholders(@host_with_port, chunk.metadata).split(":")
+          # end
 
           host_with_port = "#{host}:#{port}"
 
-          Thread.current[host_with_port] ||= create_sender(host, port)
+          Thread.current[host_with_port] = create_sender(host, port)
           sender = Thread.current[host_with_port]
 
-          facility = extract_placeholders(@facility, chunk.metadata)
-          severity = extract_placeholders(@severity, chunk.metadata)
-          program = extract_placeholders(@program, chunk.metadata)
-          hostname = extract_placeholders(@hostname, chunk.metadata)
+          facility = @facility #extract_placeholders(@facility, chunk.metadata)
+          severity = @severity #extract_placeholders(@severity, chunk.metadata)
+          program = @program #extract_placeholders(@program, chunk.metadata)
+          hostname = @hostname #extract_placeholders(@hostname, chunk.metadata)
 
+          print "facility "+facility+ " severity "+severity+" program "+program + " hostname "+hostname+" \n"
           packet_options = {facility: facility, severity: severity, program: program}
           packet_options[:hostname] = hostname unless hostname.empty?
           packet_options[:tls] = true
-          packet_options[:ca_file]="/fluentd/certs/logIQ.crt"
-          packet_options[:client_cert]="/fluentd/certs/client-crt.pem"
-          packet_options[:client_key]="/fluentd/certs/client-key.pem"
+          # packet_options[:timeout] = nil
+          packet_options[:ca_file]= "/fluentd/certs/logIQ.crt"
+          packet_options[:client_cert]= "/fluentd/certs/client-crt.pem"
+          packet_options[:client_key]= "/fluentd/certs/client-key.pem"
 
           begin
             chunk.open do |io|
               io.each_line do |msg|
-                print " sending msg \n "
-                sender.transmit(msg.chomp!, packet_options)
+                if !msg.nil? && !msg.empty?
+                  print " sending msg: "+msg.chomp!+"\n"
+                  sender.transmit(msg, packet_options)
+                else
+                  print "message was empty"
+                end
+                # result = sender.write msg
+                # print result+" \n"
               end
             end
           rescue
@@ -162,25 +172,47 @@ module Fluent
 
         def create_sender(host, port)
           print " in create sender \n"
+          print @timeout
+          print "\n"
+          print @tls
+          print "\n"
+
           options = {
               tls: @tls,
               whinyerrors: true,
               packet_size: @packet_size,
-              timeout: @timeout,
+              timeout: 20,
               timeout_exception: @timeout_exception,
-              keep_alive: @keep_alive,
+              keep_alive: true,
               keep_alive_idle: @keep_alive_idle,
               keep_alive_cnt: @keep_alive_cnt,
               keep_alive_intvl: @keep_alive_intvl,
               program: @program,
+              # protocol: "tcp",
           }
-          options[:ca_file] = @ca_file if @ca_file
-          options[:client_cert] = @client_cert if @client_cert
-          options[:client_key] = @client_key if @client_key
+          # options[:ca_file] = @ca_file if @ca_file
+          # options[:client_cert] = @client_cert if @client_cert
+          # options[:client_key] = @client_key if @client_key
           options[:verify_mode] = @verify_mode if @verify_mode
 
+          # options = {
+          #     tls: true,
+          #     whinyerrors: true,
+          #     packet_size: 1024,
+          #     timeout: nil,
+          #     timeout_exception: false,
+          #     keep_alive: false,
+          #     keep_alive_idle: nil,
+          #     keep_alive_cnt: nil,
+          #     keep_alive_intvl: nil,
+          #     program: "flash_test",
+          # }
+          options[:ca_file] = options[:ca_file] || "/fluentd/certs/logIQ.crt"
+          options[:client_cert] = options[:client_cert] || "/fluentd/certs/client-crt.pem"
+          options[:client_key] = options[:client_key] || "/fluentd/certs/client-key.pem"
+
           if @protocol == :tcp
-            print "creating tcp sender"
+            print "creating tcp sender*******************"
             sender = RemoteSyslogSender::TcpSender.new(
               host,
               port,
