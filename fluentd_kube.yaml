@@ -28,14 +28,17 @@ data:
     <match kubernetes.var.log.containers.**kube-system**.log>
       @type null
     </match>
+    <match kubernetes.var.log.containers.**flash**.log>
+      @type null
+    </match>
     <match kubernetes.**>
       @type remote_syslog
-      host ac45193df4a9d11e9b5010ef4e9f11e6-1106160978.us-east-1.elb.amazonaws.com 
+      host 104.248.108.178
       port 7514
       severity debug
       program fluentd
       protocol tcp
-      hostname ac45193df4a9d11e9b5010ef4e9f11e6-1106160978.us-east-1.elb.amazonaws.com 
+      hostname 104.248.108.178
       tag flu-kube
       tls true
       tag flu-k8s
@@ -72,7 +75,8 @@ spec:
         effect: NoSchedule
       containers:
       - name: fluentd
-        image: quay.io/ctyjrsy/logiq-syslog-tls 
+        image: quay.io/ctyjrsy/logiq-syslog-tls
+        imagePullPolicy: Never
         #image: fluent/fluentd-kubernetes-daemonset:v0.12-alpine-elasticsearch
         resources:
           limits:
